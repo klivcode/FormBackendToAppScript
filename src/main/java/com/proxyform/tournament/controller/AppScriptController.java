@@ -1,5 +1,6 @@
 package com.proxyform.tournament.controller;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
@@ -8,8 +9,12 @@ import org.springframework.http.*;
 @RequestMapping("/api")
 public class AppScriptController {
 
-    private final String APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYy9fJddcrjuImpqhVthyJNLX4Uatds562yZPFurOJSzH5oyRU-O6z4f_nSPCV1BOTwA/exec";
+    private final String appScriptUrl;
 
+    public AppScriptController() {
+        Dotenv dotenv = Dotenv.load();
+        this.appScriptUrl = dotenv.get("APPSCRIPT_URL");
+    }
     @PostMapping("/submit")
     public ResponseEntity<String> submitForm(@RequestBody String body) {
         try {
@@ -20,7 +25,7 @@ public class AppScriptController {
 
             HttpEntity<String> request = new HttpEntity<>(body, headers);
 
-            ResponseEntity<String> response = restTemplate.postForEntity(APPSCRIPT_URL, request, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(appScriptUrl, request, String.class);
 
             return ResponseEntity.ok(response.getBody());
 
