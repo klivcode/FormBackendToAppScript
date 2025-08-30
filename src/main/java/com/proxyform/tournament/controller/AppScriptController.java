@@ -12,9 +12,22 @@ public class AppScriptController {
     private final String appScriptUrl;
 
     public AppScriptController() {
-        Dotenv dotenv = Dotenv.load();
+        // Load environment variables safely
+        Dotenv dotenv = Dotenv.configure()
+                .directory("./")       // root of project
+                .ignoreIfMissing()     // ignore if .env is missing
+                .load();
+
         this.appScriptUrl = dotenv.get("APPSCRIPT_URL");
+
+        if (this.appScriptUrl == null || this.appScriptUrl.isEmpty()) {
+            throw new IllegalStateException(
+                    "APPSCRIPT_URL is not set! " +
+                            "Please configure it in Render environment variables."
+            );
+        }
     }
+
     @PostMapping("/submit")
     public ResponseEntity<String> submitForm(@RequestBody String body) {
         try {
